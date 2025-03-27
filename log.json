@@ -2,8 +2,8 @@
     "nmaprun": {
         "@scanner": "nmap",
         "@args": "/usr/lib/nmap/nmap -T3 --script vuln -A -sS -p 22,23,80,443,502,102,20000,2404,47808,4840 -oX log.xml 10.0.2.15/24",
-        "@start": "1743066071",
-        "@startstr": "Thu Mar 27 05:01:11 2025",
+        "@start": "1743067423",
+        "@startstr": "Thu Mar 27 05:23:43 2025",
         "@version": "7.95",
         "@xmloutputversion": "1.05",
         "scaninfo": {
@@ -58,8 +58,8 @@
         ],
         "host": [
             {
-                "@starttime": "1743066084",
-                "@endtime": "1743066088",
+                "@starttime": "1743067435",
+                "@endtime": "1743067440",
                 "status": {
                     "@state": "up",
                     "@reason": "arp-response",
@@ -224,7 +224,7 @@
                     "portused": {
                         "@state": "closed",
                         "@proto": "udp",
-                        "@portid": "43893"
+                        "@portid": "33603"
                     },
                     "osmatch": [
                         {
@@ -396,18 +396,18 @@
                     "hop": {
                         "@ttl": "1",
                         "@ipaddr": "10.0.2.2",
-                        "@rtt": "0.50"
+                        "@rtt": "0.82"
                     }
                 },
                 "times": {
-                    "@srtt": "500",
-                    "@rttvar": "503",
+                    "@srtt": "825",
+                    "@rttvar": "1134",
                     "@to": "100000"
                 }
             },
             {
-                "@starttime": "1743066084",
-                "@endtime": "1743066088",
+                "@starttime": "1743067435",
+                "@endtime": "1743067439",
                 "status": {
                     "@state": "up",
                     "@reason": "arp-response",
@@ -599,18 +599,18 @@
                     "hop": {
                         "@ttl": "1",
                         "@ipaddr": "10.0.2.3",
-                        "@rtt": "0.92"
+                        "@rtt": "0.83"
                     }
                 },
                 "times": {
-                    "@srtt": "922",
-                    "@rttvar": "550",
+                    "@srtt": "826",
+                    "@rttvar": "623",
                     "@to": "100000"
                 }
             },
             {
-                "@starttime": "1743066088",
-                "@endtime": "1743066090",
+                "@starttime": "1743067440",
+                "@endtime": "1743067442",
                 "status": {
                     "@state": "up",
                     "@reason": "localhost-response",
@@ -775,7 +775,7 @@
                         {
                             "@state": "closed",
                             "@proto": "udp",
-                            "@portid": "30004"
+                            "@portid": "34364"
                         }
                     ]
                 },
@@ -783,18 +783,18 @@
                     "@value": "0"
                 },
                 "times": {
-                    "@srtt": "40",
-                    "@rttvar": "19",
+                    "@srtt": "37",
+                    "@rttvar": "26",
                     "@to": "100000"
                 }
             }
         ],
         "runstats": {
             "finished": {
-                "@time": "1743066090",
-                "@timestr": "Thu Mar 27 05:01:30 2025",
-                "@summary": "Nmap done at Thu Mar 27 05:01:30 2025; 256 IP addresses (3 hosts up) scanned in 18.99 seconds",
-                "@elapsed": "18.99",
+                "@time": "1743067442",
+                "@timestr": "Thu Mar 27 05:24:02 2025",
+                "@summary": "Nmap done at Thu Mar 27 05:24:02 2025; 256 IP addresses (3 hosts up) scanned in 18.79 seconds",
+                "@elapsed": "18.79",
                 "@exit": "success"
             },
             "hosts": {
