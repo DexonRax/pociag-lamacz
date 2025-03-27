@@ -1,5 +1,4 @@
-import subprocess, xmltodict, json, re, os
-
+import subprocess, xmltodict, json, re
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -36,12 +35,7 @@ ______ _____ _____ _____  ___  _____    _       ___  ___  ___  ___  _____  _____
 
     ports = []
     addres_number = -1
-
     mac_address = ""
-    text = "network_deivce: " + network_device + "\n"
-    nmap_log_file = open("nmap.log", "w")
-    nmap_log_file.write(output)
-    nmap_log_file.close()
 
     for line in output.split("\n"):
 
@@ -77,12 +71,6 @@ ______ _____ _____ _____  ___  _____    _       ___  ___  ___  ___  _____  _____
                 
         print("\n" + bcolors.WHITE)
     print(bcolors.BOLD + bcolors.OKCYAN + "MAC: " + mac_address)
-
-    nmap_log_clean_file = open("nmapclean.log", "w")
-
-
-    nmap_log_clean_file.write(json.dumps(ports))
-    nmap_log_clean_file.close()
     
 if __name__ == "__main__":
     main()
