@@ -1,6 +1,6 @@
-Starting Nmap 7.95 ( https://nmap.org ) at 2025-03-26 09:17 EDT
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-03-27 04:47 EDT
 Nmap scan report for 10.0.2.2
-Host is up (0.0013s latency).
+Host is up (0.00050s latency).
 
 PORT      STATE    SERVICE   VERSION
 22/tcp    filtered ssh
@@ -24,10 +24,10 @@ Network Distance: 1 hop
 
 TRACEROUTE
 HOP RTT     ADDRESS
-1   1.35 ms 10.0.2.2
+1   0.50 ms 10.0.2.2
 
 Nmap scan report for 10.0.2.3
-Host is up (0.0047s latency).
+Host is up (0.00089s latency).
 
 PORT      STATE    SERVICE   VERSION
 22/tcp    filtered ssh
@@ -50,10 +50,10 @@ Network Distance: 1 hop
 
 TRACEROUTE
 HOP RTT     ADDRESS
-1   4.72 ms 10.0.2.3
+1   0.89 ms 10.0.2.3
 
 Nmap scan report for 10.0.2.15
-Host is up (0.000090s latency).
+Host is up (0.000053s latency).
 
 PORT      STATE  SERVICE   VERSION
 22/tcp    closed ssh
@@ -70,4 +70,4 @@ Too many fingerprints match this host to give specific OS details
 Network Distance: 0 hops
 
 OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
-Nmap done: 256 IP addresses (3 hosts up) scanned in 18.59 seconds
+Nmap done: 256 IP addresses (3 hosts up) scanned in 18.79 seconds
