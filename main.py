@@ -38,7 +38,7 @@ ______ _____ _____ _____  ___  _____    _       ___  ___  ___  ___  _____  _____
     """)
 
     network_device = "eth0"
-    nmap_cmd = "sudo nmap -sn -T3 --script vuln -A -sS -p 22,23,80,443,502,102,20000,2404,47808,4840 -oX log.xml $(ip a | grep " + network_device + " | awk '{print $2}' | tail -n 1)"
+    nmap_cmd = "sudo nmap -T3 --script vuln -A -sS -p 22,23,80,443,502,102,20000,2404,47808,4840 -oX log.xml $(ip a | grep " + network_device + " | awk '{print $2}' | tail -n 1)"
     output = subprocess.run(nmap_cmd, shell=True, capture_output=True, text=True).stdout
     with open("log.xml") as xml_file, open("log.json", "w") as json_file:
         json.dump(xmltodict.parse(xml_file.read()), json_file, indent=4)
