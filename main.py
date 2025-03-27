@@ -28,8 +28,35 @@ ______ _____ _____ _____  ___  _____    _       ___  ___  ___  ___  _____  _____
 # pobawic sie z wszystkim co czapter napisal 
 
     network_device = "eth0"
-    nmap_cmd = "sudo nmap -T3 --script vuln -A -sS -p 22,23,80,443,502,102,20000,2404,47808,4840 -oX log.xml $(ip a | grep " + network_device + " | awk '{print $2}' | tail -n 1)"
-    output = subprocess.run(nmap_cmd, shell=True, capture_output=True, text=True).stdout
+
+    main_loop = True
+    print("0. Check modbus for vunerabilities")
+    answer = ""
+    nmap_command = ""
+
+    ip_address = "172.17.0.1"
+    #ip_address = "0.0.0.0"
+
+    while main_loop:
+        answer = input("Choose option: ")
+
+        if answer == "0":
+            nmap_command = "nmap -p 502 --script modbus-discover 0.0.0.0/16"
+            #nmap_command = "nmap --script modbus-discover.nse --script-args='modbus-discover.aggressive=true' -p 502,5020 "+ip_address
+            #nmap_command = "sudo nmap -T3 --script=modbus_discovery -A -sS -p 502,5020 -oX log.xml "+ ip_address
+            break
+        else:
+            pass
+
+
+    use_direct_ip_address = True
+    
+    #nmap_cmd = ""
+    #if use_direct_ip_address:
+        #nmap_cmd = "sudo nmap -T3 --script vuln -A -sS -p 22,23,80,443,502,5020,102,20000,2404,47808,4840 -oX log.xml " + ip_address + "/16"
+    #else:
+        #nmap_cmd = "sudo nmap -T3 --script vuln -A -sS -p 22,23,80,443,502,5020,102,20000,2404,47808,4840 -oX log.xml $(ip a | grep " + network_device + " | awk '{print $2}' | tail -n 1)"
+    output = subprocess.run(nmap_command, shell=True, capture_output=True, text=True).stdout
     with open("log.xml") as xml_file, open("log.json", "w") as json_file:
         json.dump(xmltodict.parse(xml_file.read()), json_file, indent=4)
 
