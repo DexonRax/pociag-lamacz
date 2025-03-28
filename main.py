@@ -1,35 +1,89 @@
-import subprocess, xmltodict, json, re
+import subprocess, xmltodict, json, os, shutil
+
+if os.path.exists("logs"):
+    shutil.rmtree("logs")
+
 class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
+    OKGREEN = '\033[92m'  # Zielony dla otwartych
+    WARNING = '\033[93m'  # Żółty dla filtrowanych
+    FAIL = '\033[91m'     # Czerwony dla zamkniętych
     ENDC = '\033[0m'
     BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-    WHITE ='\033[0;37m'  
 
-def discoverHosts(subnet):
-    cmd = f"sudo nmap -sn {subnet} -oX hosts.xml"
+def scan_active_hosts(subnet, range_start, range_end):
+
+    cmd = f"sudo nmap -sn {subnet}.{range_start}-{range_end} -oX logs/hosts.xml"
     subprocess.run(cmd, shell=True)
 
-    # Wczytaj dane XML
-    with open("hosts.xml", "r") as file:
-        xml_data = file.read()
-
-    # Przetwarzanie XML za pomocą xmltodict
-    data = xmltodict.parse(xml_data)
-
+    with open("logs/hosts.xml", "r") as file:
+        data = xmltodict.parse(file.read())
+    
     hosts = []
+    if 'host' in data['nmaprun']:
+        host_data = data['nmaprun']['host']
+        if isinstance(host_data, list):
+            for host in host_data:
+                addresses = host['address']
+                if isinstance(addresses, list):
+                    for addr in addresses:
+                        if addr['@addrtype'] == 'ipv4':
+                            hosts.append(addr['@addr'])
+                elif addresses['@addrtype'] == 'ipv4':
+                    hosts.append(addresses['@addr'])
+        elif isinstance(host_data, dict):
+            addresses = host_data['address']
+            if isinstance(addresses, list):
+                for addr in addresses:
+                    if addr['@addrtype'] == 'ipv4':
+                        hosts.append(addr['@addr'])
+            elif addresses['@addrtype'] == 'ipv4':
+                hosts.append(addresses['@addr'])
 
-    # Wyciąganie aktywnych adresów IP
-    for host in data['nmaprun']['host']:
-        if 'address' in host:
-            ip = host['address']['@addr']
-            hosts.append(ip)
-    return hosts
+    if not hosts:
+        print("Brak aktywnych hostów.")
+        return {}
+    print("\nScanning resources....")
+    
+    results = {}
+    for ip in hosts:
+        cmd = f"sudo nmap -T4 -sS -A -p 22,23,80,443,502,5020,102,20000,2404,47808,4840 -oX logs/resources.xml {ip}"
+        subprocess.run(cmd, shell=True, capture_output=True, text=True)
+
+        with open("logs/resources.xml", "r") as file:
+            data = xmltodict.parse(file.read())
+
+        details = {"ports": [], "os": None}
+        if 'host' in data['nmaprun']:
+            host = data['nmaprun']['host']
+            if isinstance(host, list):
+                host = host[0]
+
+            if 'ports' in host and 'port' in host['ports']:
+                ports = host['ports']['port']
+                if isinstance(ports, list):
+                    for port in ports:
+                        port_id = port['@portid']
+                        state = port['state']['@state']
+                        service = port.get('service', {}).get('@name', 'unknown')
+                        details["ports"].append({"port": port_id, "state": state, "service": service})
+                elif isinstance(ports, dict):
+                    port_id = ports['@portid']
+                    state = ports['state']['@state']
+                    service = ports.get('service', {}).get('@name', 'unknown')
+                    details["ports"].append({"port": port_id, "state": state, "service": service})
+
+            if 'os' in host and 'osmatch' in host['os']:
+                osmatch = host['os']['osmatch']
+                details["os"] = osmatch['@name'] if isinstance(osmatch, dict) else osmatch[0]['@name']
+
+        results[ip] = details
+
+    return results
+
+def scan_modbus(subnet, range_start, range_end):
+    cmd = f"sudo nmap -p 502 --script modbus-discover {subnet}.{range_start}-{range_end} -oX logs/modbus.xml"
+    output = subprocess.run(cmd, shell=True, capture_output=True, text=True).stdout
+    print("Wynik skanowania Modbus:\n", output)
 
 def main():
     print(r"""
@@ -41,83 +95,44 @@ ______ _____ _____ _____  ___  _____    _       ___  ___  ___  ___  _____  _____
 \_|    \___/ \____/\___/\_| |_/\____/  \_____/\_| |_/\_|  |_/\_| |_/\____/\_____/   \___/ \___/(_)\___/                                                                                                     
     """)
 
-    network_device = "eth0"
-    use_direct_ip_address = False
-    
-    main_loop = True
-    print("0. Find active hosts in the subnet")
-    print("1. Check modbus for vunerabilities")
-
-    answer = ""
-    nmap_command = ""
-
-    ip_address = "10.0.2.15"
-    #ip_address = "0.0.0.0"
+    print("0. Find active hosts and their resources in the subnet")
+    print("1. Check modbus for vulnerabilities")
 
     answer = input("Choose option: ")
+
+    subnet = input("Enter subnet (e.g., 10.0.2): ").strip()
+    range_start = input("Enter first address (e.g., 1): ").strip()
+    range_end = input("Enter last address (e.g., 18): ").strip()
+
+    os.makedirs("logs", exist_ok=True)
+    
     if answer == "0":
-        if use_direct_ip_address:
-            nmap_command = "sudo nmap -T3 --script vuln -A -sS -p 22,23,80,443,502,5020,102,20000,2404,47808,4840 -oX log.xml " + ip_address + "/16"
-        else:
-            nmap_command = "sudo nmap -T3 --script vuln -A -sS -p 22,23,80,443,502,5020,102,20000,2404,47808,4840 -oX log.xml $(ip a | grep " + network_device + " | awk '{print $2}' | tail -n 1)"
-        
-        output = subprocess.run(nmap_command, shell=True, capture_output=True, text=True).stdout
-        ports = []
-        addres_number = -1
-        mac_address = ""
+        results = scan_active_hosts(subnet, range_start, range_end)
 
-        #subnet = input("Enter subnet with mask (e.g., 192.168.1.0/24): ").strip()
-        subnet = "192.168.1.0/24"
-        hosts = discoverHosts(subnet)
-        print("\nFound hosts: ", hosts)
-        
-        for line in output.split("\n"):
+        for ip, details in results.items():
+            print(f"\n{bcolors.BOLD}Host: {ip}{bcolors.ENDC}")
+            for port in details['ports']:
+                if port['state'] == 'open':
+                    color = bcolors.OKGREEN
+                elif port['state'] == 'filtered':
+                    color = bcolors.WARNING
+                else: 
+                    color = bcolors.FAIL
+                print(f"{color}Port {port['port']}: {port['state']} ({port['service']}){bcolors.ENDC}")
+            if details['os']:
+                print(f"System operacyjny: {details['os']}")
 
-            if "Nmap scan report for" in line:
-                ports.append([])
-                addres_number += 1
-                ports[addres_number].append(line.split(" ")[4])
-
-            if "open" in line and "Warning" not in line:
-                ports[addres_number].append(re.split(r'[;,\s]+', line))
-            elif "filtered" in line and "Warning" not in line:
-                ports[addres_number].append(re.split(r'[;,\s]+', line))
-            elif "closed" in line and "Warning" not in line:
-                ports[addres_number].append(re.split(r'[;,\s]+', line))
-
-            if "MAC Address:" in line:
-                mac_address = line.split(" ")[2]
-
-            if "Nmap done:" in line:
-                print(line)
-        
-        print("scanned addresses: ", addres_number+1, "\n")
-        for i in range(addres_number+1):
-            for port in ports[i]:
-                if port == ports[i][0]:
-                    print(bcolors.WHITE + bcolors.BOLD + "IP: " + port + bcolors.WHITE)
-                if port[1] == "open":
-                    print(bcolors.OKGREEN + port[0].split("/")[0] + " [" + port[0].split("/")[1] + "] ("+ port[2] +")")
-                if port[1] == "filtered":
-                    print(bcolors.WARNING + port[0].split("/")[0] + " [" + port[0].split("/")[1] + "] ("+ port[2] +")")
-                if port[1] == "closed":
-                    print(bcolors.FAIL + port[0].split("/")[0] + " [" + port[0].split("/")[1] + "] ("+ port[2] +")")
-                    
-            print("\n" + bcolors.WHITE)
-        print(bcolors.BOLD + bcolors.OKCYAN + "MAC: " + mac_address)
-
-    if answer == "1":
-        nmap_command = "nmap -p 502 --script modbus-discover 0.0.0.0/16 -oX log.xml"
-        #nmap_command = "nmap --script modbus-discover.nse --script-args='modbus-discover.aggressive=true' -p 502,5020 "+ip_address
-        #nmap_command = "sudo nmap -T3 --script=modbus_discovery -A -sS -p 502,5020 -oX log.xml "+ ip_address
-
-        output = subprocess.run(nmap_command, shell=True, capture_output=True, text=True).stdout
+    elif answer == "1":
+        scan_modbus(subnet, range_start, range_end)
 
     try:
-        with open("log.xml") as xml_file, open("log.json", "w") as json_file:
+        with open("logs/hosts.xml") as xml_file, open("logs/hosts.json", "w") as json_file:
             json.dump(xmltodict.parse(xml_file.read()), json_file, indent=4)
-        with open("hosts.xml") as xml_file, open("hosts.json", "w") as json_file:
+        with open("logs/resources.xml") as xml_file, open("logs/resources.json", "w") as json_file:
             json.dump(xmltodict.parse(xml_file.read()), json_file, indent=4)
+        if os.path.exists("logs/modbus.xml"):
+            with open("logs/modbus.xml") as xml_file, open("logs/modbus.json", "w") as json_file:
+                json.dump(xmltodict.parse(xml_file.read()), json_file, indent=4)
     except Exception as e:
         print(f"{bcolors.FAIL}Error while converting XML to JSON: {e}{bcolors.ENDC}")
 
