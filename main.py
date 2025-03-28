@@ -4,9 +4,9 @@ if os.path.exists("logs"):
     shutil.rmtree("logs")
 
 class bcolors:
-    OKGREEN = '\033[92m'  # Zielony dla otwartych
-    WARNING = '\033[93m'  # Żółty dla filtrowanych
-    FAIL = '\033[91m'     # Czerwony dla zamkniętych
+    OKGREEN = '\033[92m' 
+    WARNING = '\033[93m' 
+    FAIL = '\033[91m'
     ENDC = '\033[0m'
     BOLD = '\033[1m'
 
@@ -83,7 +83,7 @@ def scan_active_hosts(subnet, range_start, range_end):
 def scan_modbus(subnet, range_start, range_end):
     cmd = f"sudo nmap -p 502 --script modbus-discover {subnet}.{range_start}-{range_end} -oX logs/modbus.xml"
     output = subprocess.run(cmd, shell=True, capture_output=True, text=True).stdout
-    print("Wynik skanowania Modbus:\n", output)
+    print("Modbus scan results:\n", output)
 
 def main():
     print(r"""
@@ -99,13 +99,13 @@ ______ _____ _____ _____  ___  _____    _       ___  ___  ___  ___  _____  _____
     print("1. Check modbus for vulnerabilities")
 
     answer = input("Choose option: ")
-
+    
     subnet = input("Enter subnet (e.g., 10.0.2): ").strip()
     range_start = input("Enter first address (e.g., 1): ").strip()
     range_end = input("Enter last address (e.g., 18): ").strip()
 
     os.makedirs("logs", exist_ok=True)
-    
+
     if answer == "0":
         results = scan_active_hosts(subnet, range_start, range_end)
 
@@ -120,16 +120,18 @@ ______ _____ _____ _____  ___  _____    _       ___  ___  ___  ___  _____  _____
                     color = bcolors.FAIL
                 print(f"{color}Port {port['port']}: {port['state']} ({port['service']}){bcolors.ENDC}")
             if details['os']:
-                print(f"System operacyjny: {details['os']}")
+                print(f"Operating system: {details['os']}")
 
     elif answer == "1":
         scan_modbus(subnet, range_start, range_end)
 
     try:
-        with open("logs/hosts.xml") as xml_file, open("logs/hosts.json", "w") as json_file:
-            json.dump(xmltodict.parse(xml_file.read()), json_file, indent=4)
-        with open("logs/resources.xml") as xml_file, open("logs/resources.json", "w") as json_file:
-            json.dump(xmltodict.parse(xml_file.read()), json_file, indent=4)
+        if os.path.exists("logs/hosts.xml"):
+            with open("logs/hosts.xml") as xml_file, open("logs/hosts.json", "w") as json_file:
+                json.dump(xmltodict.parse(xml_file.read()), json_file, indent=4)
+        if os.path.exists("logs/resources.xml"):
+            with open("logs/resources.xml") as xml_file, open("logs/resources.json", "w") as json_file:
+                json.dump(xmltodict.parse(xml_file.read()), json_file, indent=4)
         if os.path.exists("logs/modbus.xml"):
             with open("logs/modbus.xml") as xml_file, open("logs/modbus.json", "w") as json_file:
                 json.dump(xmltodict.parse(xml_file.read()), json_file, indent=4)
