@@ -3,16 +3,19 @@ import subprocess, xmltodict, json, os, shutil, argparse
 class bcolors:
     OKGREEN = '\033[92m' 
     WARNING = '\033[93m' 
+    BGTEXT = '\033[90m'
     FAIL = '\033[91m'
     ENDC = '\033[0m'
     BOLD = '\033[1m'
+    UDLN = '\033[4m'
+    
 
 if os.path.exists("logs"):
     shutil.rmtree("logs")
     print(f"{bcolors.OKGREEN}Deleted existing log files.{bcolors.ENDC}")
 
 def scan_active_hosts(subnet, range_start, range_end, nmap_flags, nmap_ports):
-    print("\nPerforming hosts scan...")
+    print(f"{bcolors.BGTEXT}\nPerforming hosts scan...{bcolors.ENDC}")
     cmd = f"sudo nmap -sn {subnet}.{range_start}-{range_end} -oX logs/hosts.xml"
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     process.wait()
@@ -42,7 +45,7 @@ def scan_active_hosts(subnet, range_start, range_end, nmap_flags, nmap_ports):
                 hosts.append(addresses['@addr'])
 
     if not hosts:
-        print("No active hosts.")
+        print(f"{bcolors.WARNING}No active hosts.{bcolors.ENDC}")
         return {}
     print("\nScanning resources....")
     
@@ -84,17 +87,17 @@ def scan_active_hosts(subnet, range_start, range_end, nmap_flags, nmap_ports):
     return results
 
 def scan_modbus(subnet, range_start, range_end, nmap_flags):
-    print("\nPerforming modbus scan...")
+    print(f"\n{bcolors.BGTEXT}Performing modbus scan...{bcolors.ENDC}")
     cmd = f"sudo nmap {nmap_flags} -p 502 --script modbus-discover {subnet}.{range_start}-{range_end} -oX logs/modbus.xml"
-    print(f"Executing: {cmd}")
+    print(f"{bcolors.BGTEXT}Executing: {cmd}{bcolors.ENDC}")
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     output = process.communicate()[0]
-    print("Modbus scan results:\n", output)
+    print(f"{bcolors.BOLD}Modbus scan results:\n{bcolors.ENDC}", output)
 
 def scan_vurnabilities(subnet, range_start, range_end, nmap_flags, nmap_ports, nmap_vurnability_script):
-    print("\nPerforming vulnerability scan...")
+    print(f"\n{bcolors.BGTEXT}Performing vulnerability scan...{bcolors.ENDC}")
     cmd_vuln = f"sudo nmap {nmap_flags} -p {nmap_ports} --script {nmap_vurnability_script} {subnet}.{range_start}-{range_end} -oX logs/vulnerabilities.xml"
-    print(f"Executing: {cmd_vuln}") 
+    print(f"{bcolors.BGTEXT}Executing: {cmd_vuln}{bcolors.ENDC}") 
     process = subprocess.Popen(cmd_vuln, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     vuln_output = process.communicate()[0]
     print("Vulnerability scan results:\n", vuln_output)
@@ -131,26 +134,26 @@ ______ _____ _____ _____  ___  _____    _       ___  ___  ___  ___  _____  _____
         nmap_ports = args.ports
         nmap_flags = args.flags
         nmap_vurnability_script = args.vuln_script
-        print(f"Debug: subnet={subnet}, range_start={range_start}, range_end={range_end}, option={answer}")
-        print(f"Debug: ports={nmap_ports}, flags={nmap_flags}, vuln_script={nmap_vurnability_script}")
+        print(f"{bcolors.BGTEXT}Debug: subnet={subnet}, range_start={range_start}, range_end={range_end}, option={answer}")
+        print(f"Debug: ports={nmap_ports}, flags={nmap_flags}, vuln_script={nmap_vurnability_script}{bcolors.ENDC}")
     else:
-        print("0. Find active hosts and their resources in the subnet")
-        print("1. Find active hosts, their resources and vulnerabilities in the subnet")
-        print("2. Check modbus for vulnerabilities (should work only with an activated modbus)")
+        print("  0. Find active hosts and their resources in the subnet")
+        print("  1. Find active hosts, their resources and vulnerabilities in the subnet")
+        print("  2. Check modbus for vulnerabilities (should work only with an activated modbus)")
         answer = input("Choose option: ").strip()
         if not answer or answer not in ['0', '1', '2']:
             print(f"{bcolors.FAIL}Invalid option selected. Please choose 0, 1, or 2.{bcolors.ENDC}")
             return
-        subnet = input("Enter subnet (e.g., 10.0.2): ").strip()
+        subnet = input(f"{bcolors.UDLN}Enter subnet (e.g., 10.0.2): ").strip()
         range_start = input("Enter first address (e.g., 1): ").strip()
-        range_end = input("Enter last address (e.g., 18): ").strip()
+        range_end = input(f"Enter last address (e.g., 18): {bcolors.ENDC}").strip()
 
         # Scan variables (defaults for interactive mode)
         nmap_ports = "22,23,80,443,502,5020,102,20000,2404,47808,4840" 
         nmap_flags = "-T4 -sS -A"
         nmap_vurnability_script = "default"
-        print(f"Debug: subnet={subnet}, range_start={range_start}, range_end={range_end}, option={answer}")
-        print(f"Debug: ports={nmap_ports}, flags={nmap_flags}, vuln_script={nmap_vurnability_script}")
+        print(f"{bcolors.BGTEXT}Debug: subnet={subnet}, range_start={range_start}, range_end={range_end}, option={answer}{bcolors.ENDC}")
+        print(f"{bcolors.BGTEXT}Debug: ports={nmap_ports}, flags={nmap_flags}, vuln_script={nmap_vurnability_script}{bcolors.ENDC}")
 
     if not subnet or not range_start or not range_end:
         print(f"{bcolors.FAIL}Error: Subnet and range values must be provided.{bcolors.ENDC}")
