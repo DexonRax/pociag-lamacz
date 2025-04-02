@@ -1,0 +1,4 @@
+#ignoring logs
+logs/
+*.xml
+*.json
