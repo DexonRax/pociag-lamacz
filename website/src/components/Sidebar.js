@@ -1,29 +1,49 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Sidebar = ({ activeView, onNavigate }) => {
-  const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'scans', label: 'Scans', icon: '🔍' },
-    { id: 'reports', label: 'Reports', icon: '📄' },
-    { id: 'settings', label: 'Settings', icon: '⚙️' },
-  ];
+  const navigate = useNavigate(); // Hook do nawigacji
 
+  const handleDashboardClick = () => {
+    navigate('/'); // Przekierowanie na stronę główną
+    onNavigate('dashboard'); // Zachowujemy zgodność z App.js
+  };
+  const handleHelpClick = () => {
+    navigate('/Help');
+    onNavigate('Help');
+  };
   return (
     <aside className="sidebar">
       <nav className="sidebar-nav">
         <ul>
-          {menuItems.map(item => (
-            <li key={item.id} className={activeView === item.id ? 'active' : ''}>
-              <button onClick={() => onNavigate(item.id)}>
-                <span className="icon">{item.icon}</span>
-                <span>{item.label}</span>
-              </button>
-            </li>
-          ))}
+          <li className={activeView === 'dashboard' ? 'active' : ''}>
+            <button onClick={handleDashboardClick}>
+              <span className="icon">📊</span>
+              <span>Dashboard</span>
+            </button>
+          </li>
+          <li className={activeView === 'scans' ? 'active' : ''}>
+            <button onClick={() => onNavigate('scans')}>
+              <span className="icon">🔍</span>
+              <span>Scans</span>
+            </button>
+          </li>
+          <li className={activeView === 'reports' ? 'active' : ''}>
+            <button onClick={() => onNavigate('reports')}>
+              <span className="icon">📄</span>
+              <span>Reports</span>
+            </button>
+          </li>
+          <li className={activeView === 'settings' ? 'active' : ''}>
+            <button onClick={() => onNavigate('settings')}>
+              <span className="icon">⚙️</span>
+              <span>Settings</span>
+            </button>
+          </li>
         </ul>
       </nav>
       <div className="sidebar-footer">
-        <button className="btn btn-help">
+        <button className="btn btn-help" onClick={handleHelpClick}>
           <span className="icon">❓</span>
           <span>Help & Support</span>
         </button>

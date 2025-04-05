@@ -1,35 +1,26 @@
 import React, { useState } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
+import { Routes, Route } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import ScanResults from './components/ScanResults';
-import VulnerabilityDetails from './components/VulnerabilityDetails';
 import Header from './components/Header';
+import ScanForm from './components/ScanForm';
+import Help from './components/Help';
+import axios from 'axios';
 
 function App() {
   const [activeView, setActiveView] = useState('dashboard');
   const [activeScan, setActiveScan] = useState(null);
-  const [activeVulnerability, setActiveVulnerability] = useState(null);
-
-  // Mock scan data
-  const scanData = [
-    { id: 1, name: 'Web Server Scan', status: 'Complete', vulnerabilities: 14, date: '2025-04-01', severity: 'high' },
-    { id: 2, name: 'Database Server Scan', status: 'In Progress', vulnerabilities: 7, date: '2025-04-02', severity: 'medium' },
-    { id: 3, name: 'Network Devices Scan', status: 'Scheduled', vulnerabilities: 0, date: '2025-04-03', severity: 'none' },
-  ];
-
-  // Mock vulnerability data for the selected scan
-  const vulnerabilityData = [
-    { id: 101, scanId: 1, name: 'SQL Injection', severity: 'critical', status: 'Open', description: 'SQL injection vulnerability detected in login form' },
-    { id: 102, scanId: 1, name: 'Cross-Site Scripting (XSS)', severity: 'high', status: 'Open', description: 'Reflected XSS found in search functionality' },
-    { id: 103, scanId: 1, name: 'Outdated SSL Certificate', severity: 'medium', status: 'In Review', description: 'Server uses outdated SSL certificate' },
-    { id: 104, scanId: 2, name: 'Default Database Credentials', severity: 'critical', status: 'Open', description: 'Database using default credentials' },
-  ];
+  const [scanData, setScanData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleNavigation = (view) => {
     setActiveView(view);
     setActiveScan(null);
-    setActiveVulnerability(null);
   };
 
   const handleScanSelect = (scanId) => {
@@ -37,28 +28,41 @@ function App() {
     setActiveView('scanResults');
   };
 
-  const handleVulnerabilitySelect = (vulnId) => {
-    setActiveVulnerability(vulnId);
-    setActiveView('vulnerabilityDetails');
+  const handleNewScan = async (scanInput) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await axios.post('http://localhost:5000/scan-active-hosts', scanInput);
+      const newScan = {
+        id: Date.now(),
+        name: `Scan ${scanData.length + 1}`,
+        status: 'Complete',
+        date: new Date().toISOString().split('T')[0],
+        hosts: response.data.hosts || [],
+      };
+      setScanData([...scanData, newScan]);
+      toast.success("✅ Scan completed successfully!");
+      setActiveScan(newScan.id);
+      setActiveView('scanResults');
+    } catch (err) {
+      const message = err.response?.data?.error || 'Failed to start scan';
+      toast.error(message);
+      setError(message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Render the current view
-  const renderView = () => {
+  const renderMainView = () => {
     switch (activeView) {
       case 'dashboard':
         return <Dashboard scanData={scanData} onScanSelect={handleScanSelect} />;
       case 'scanResults':
+        const selectedScan = scanData.find((scan) => scan.id === activeScan);
         return (
-          <ScanResults 
-            scanData={scanData.find(scan => scan.id === activeScan)} 
-            vulnerabilities={vulnerabilityData.filter(vuln => vuln.scanId === activeScan)}
-            onVulnerabilitySelect={handleVulnerabilitySelect}
-          />
-        );
-      case 'vulnerabilityDetails':
-        return (
-          <VulnerabilityDetails 
-            vulnerability={vulnerabilityData.find(vuln => vuln.id === activeVulnerability)}
+          <ScanResults
+            scanData={selectedScan || { name: 'No Scan Selected', hosts: [] }}
+            vulnerabilities={[]}
           />
         );
       default:
@@ -68,11 +72,16 @@ function App() {
 
   return (
     <div className="app">
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
       <Header />
       <div className="main-container">
         <Sidebar activeView={activeView} onNavigate={handleNavigation} />
         <main className="content">
-          {renderView()}
+          <Routes>
+            <Route path="/" element={renderMainView()} />
+            <Route path="/scan-form" element={<ScanForm onScanSubmit={handleNewScan} />} />
+            <Route path="/help" element={<Help />} /> {}
+          </Routes>
         </main>
       </div>
     </div>

@@ -1,7 +1,6 @@
 import React from 'react';
 
 const Dashboard = ({ scanData, onScanSelect }) => {
-  // Calculate summary stats
   const completedScans = scanData.filter(scan => scan.status === 'Complete').length;
   const inProgressScans = scanData.filter(scan => scan.status === 'In Progress').length;
   const totalVulnerabilities = scanData.reduce((sum, scan) => sum + scan.vulnerabilities, 0);
@@ -15,7 +14,16 @@ const Dashboard = ({ scanData, onScanSelect }) => {
       default: return 'severity-none';
     }
   };
-
+  if (scanData.length === 0) {
+    return (
+      <div className="dashboard empty-dashboard">
+        <h2>Security Dashboard</h2>
+        <div className="empty-state">
+          <p>No scans yet. Click "New Scan" to start.</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="dashboard">
       <h2>Security Dashboard</h2>
