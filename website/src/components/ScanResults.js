@@ -4,7 +4,7 @@ const ScanResults = ({ scanData, vulnerabilities, onVulnerabilitySelect }) => {
   if (!scanData) return <div>No scan selected</div>;
 
   const getSeverityClass = (severity) => {
-    switch(severity) {
+    switch (severity) {
       case 'critical': return 'severity-critical';
       case 'high': return 'severity-high';
       case 'medium': return 'severity-medium';
@@ -49,7 +49,7 @@ const ScanResults = ({ scanData, vulnerabilities, onVulnerabilitySelect }) => {
                     <td>{vuln.name}</td>
                     <td>
                       <span className={`severity-badge ${getSeverityClass(vuln.severity)}`}>
-                        {vuln.severity}
+                        {vuln.severity || 'None'}
                       </span>
                     </td>
                     <td>
@@ -61,6 +61,21 @@ const ScanResults = ({ scanData, vulnerabilities, onVulnerabilitySelect }) => {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+      </div>
+
+      <div className="section">
+        <h3>Active Hosts</h3>
+        {scanData.hosts && scanData.hosts.length > 0 ? (
+          <ul className="host-list">
+            {scanData.hosts.map((host, index) => (
+              <li key={index}>{host}</li>
+            ))}
+          </ul>
+        ) : (
+          <div className="empty-state">
+            <p>No active hosts found in this scan.</p>
           </div>
         )}
       </div>

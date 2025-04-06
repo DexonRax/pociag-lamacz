@@ -2,11 +2,23 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Sidebar = ({ activeView, onNavigate }) => {
-  const navigate = useNavigate(); // Hook do nawigacji
+  const navigate = useNavigate(); 
 
   const handleDashboardClick = () => {
-    navigate('/'); // Przekierowanie na stronę główną
-    onNavigate('dashboard'); // Zachowujemy zgodność z App.js
+    navigate('/');
+    onNavigate('dashboard'); 
+  };
+  const handleScanClick = () => {
+    navigate('/Scans');
+    onNavigate('scans');
+  };
+  const handleTrashClick = () => {
+    navigate('/Trash');
+    onNavigate('trash');
+  };
+  const handleSettingsClick = () => {
+    navigate('/Settings');
+    onNavigate('settings');
   };
   const handleHelpClick = () => {
     navigate('/Help');
@@ -22,20 +34,14 @@ const Sidebar = ({ activeView, onNavigate }) => {
               <span>Dashboard</span>
             </button>
           </li>
-          <li className={activeView === 'scans' ? 'active' : ''}>
-            <button onClick={() => onNavigate('scans')}>
-              <span className="icon">🔍</span>
-              <span>Scans</span>
-            </button>
-          </li>
-          <li className={activeView === 'reports' ? 'active' : ''}>
-            <button onClick={() => onNavigate('reports')}>
-              <span className="icon">📄</span>
-              <span>Reports</span>
+          <li className={activeView === 'trash' ? 'active' : ''}>
+            <button onClick={handleTrashClick}>
+              <span className="icon">🗑️</span>
+              <span>Trash</span>
             </button>
           </li>
           <li className={activeView === 'settings' ? 'active' : ''}>
-            <button onClick={() => onNavigate('settings')}>
+            <button onClick={handleSettingsClick}>
               <span className="icon">⚙️</span>
               <span>Settings</span>
             </button>
@@ -43,7 +49,7 @@ const Sidebar = ({ activeView, onNavigate }) => {
         </ul>
       </nav>
       <div className="sidebar-footer">
-        <button className="btn btn-help" onClick={handleHelpClick}>
+        <button className={activeView === 'Help' ? 'btn btn-help active' : 'btn btn-help'} onClick={handleHelpClick}>
           <span className="icon">❓</span>
           <span>Help & Support</span>
         </button>

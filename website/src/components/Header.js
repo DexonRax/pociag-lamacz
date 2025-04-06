@@ -9,7 +9,7 @@ const Header = () => {
       </div>
       <div className="header-controls">
         <Link to="/scan-form">
-          <button className="btn btn-primary">New Scan</button>
+          <button className="btn btn-primary">Nowy skan</button>
         </Link>
       </div>
     </header>

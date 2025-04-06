@@ -3,10 +3,10 @@ import React from 'react';
 const Dashboard = ({ scanData, onScanSelect }) => {
   const completedScans = scanData.filter(scan => scan.status === 'Complete').length;
   const inProgressScans = scanData.filter(scan => scan.status === 'In Progress').length;
-  const totalVulnerabilities = scanData.reduce((sum, scan) => sum + scan.vulnerabilities, 0);
-  
+  const totalVulnerabilities = scanData.reduce((sum, scan) => sum + (scan.vulnerabilities || 0), 0);
+
   const getSeverityClass = (severity) => {
-    switch(severity) {
+    switch (severity) {
       case 'critical': return 'severity-critical';
       case 'high': return 'severity-high';
       case 'medium': return 'severity-medium';
@@ -14,50 +14,52 @@ const Dashboard = ({ scanData, onScanSelect }) => {
       default: return 'severity-none';
     }
   };
+
   if (scanData.length === 0) {
     return (
       <div className="dashboard empty-dashboard">
-        <h2>Security Dashboard</h2>
+        <h2>Panel zabezpieczeń</h2>
         <div className="empty-state">
-          <p>No scans yet. Click "New Scan" to start.</p>
+          <p>Brak skanów. Kliknij "Nowy skan".</p>
         </div>
       </div>
     );
   }
+
   return (
     <div className="dashboard">
-      <h2>Security Dashboard</h2>
-      
+      <h2>Panel zabezpieczeń</h2>
+
       <div className="stat-cards">
         <div className="stat-card">
-          <h3>Total Scans</h3>
+          <h3>Wszystkie skany</h3>
           <div className="stat-value">{scanData.length}</div>
         </div>
         <div className="stat-card">
-          <h3>Completed</h3>
+          <h3>Ukończone</h3>
           <div className="stat-value">{completedScans}</div>
         </div>
         <div className="stat-card">
-          <h3>In Progress</h3>
+          <h3>W trakcie</h3>
           <div className="stat-value">{inProgressScans}</div>
         </div>
         <div className="stat-card">
-          <h3>Vulnerabilities</h3>
+          <h3>Podatności</h3>
           <div className="stat-value">{totalVulnerabilities}</div>
         </div>
       </div>
 
       <div className="section">
-        <h3>Recent Scans</h3>
+        <h3>Wszystkie skany</h3>
         <div className="table-container">
           <table className="data-table">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Date</th>
+                <th>Nazwa</th>
+                <th>Data</th>
                 <th>Status</th>
-                <th>Vulnerabilities</th>
-                <th>Severity</th>
+                <th>Podatności</th>
+                <th>Powaga</th>
               </tr>
             </thead>
             <tbody>
@@ -70,10 +72,10 @@ const Dashboard = ({ scanData, onScanSelect }) => {
                       {scan.status}
                     </span>
                   </td>
-                  <td>{scan.vulnerabilities}</td>
+                  <td>{scan.vulnerabilities || 0}</td>
                   <td>
                     <span className={`severity-badge ${getSeverityClass(scan.severity)}`}>
-                      {scan.severity}
+                      {scan.severity || 'None'}
                     </span>
                   </td>
                 </tr>

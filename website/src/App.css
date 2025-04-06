@@ -257,41 +257,60 @@ ul {
   color: var(--text-primary);
 }
 
-/* Tables */
+/* Tables - Nowszy, ładniejszy styl */
 .table-container {
   overflow-x: auto;
   background-color: var(--bg-secondary);
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border-color);
 }
 
 .data-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
-.data-table th, .data-table td {
-  padding: 1rem;
+.data-table th,
+.data-table td {
+  padding: 1rem 1.5rem;
   text-align: left;
   border-bottom: 1px solid var(--border-color);
 }
 
 .data-table th {
-  font-weight: 500;
+  background-color: var(--bg-tertiary);
   color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.data-table td {
+  color: var(--text-primary);
+  font-size: 0.95rem;
 }
 
 .data-table tbody tr {
-  cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s ease;
 }
 
 .data-table tbody tr:hover {
-  background-color: var(--bg-tertiary);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .data-table tbody tr:last-child td {
   border-bottom: none;
+}
+
+/* Subtle row striping */
+.data-table tbody tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.02);
 }
 
 /* Severity Badges */
@@ -560,8 +579,8 @@ ul {
   width: 100%;
   margin-top: 1rem;
 }
+
 .help-page {
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
@@ -628,4 +647,23 @@ ul {
 
 .help-content h2 {
   color: #1a73e8;
+}
+
+.host-list {
+  list-style: none;
+  padding: 0;
+}
+
+.host-list li {
+  padding: 0.5rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.host-list li:last-child {
+  border-bottom: none;
+}
+
+.section h3 {
+  margin-top: 1.5rem;
+  color: #333;
 }
