@@ -79,18 +79,16 @@ def scan_vurnabilities(subnet, range_start, range_end):
 @app.route('/scan-active-hosts', methods=['POST'])
 def scan_hosts():
     data = request.get_json()
-    subnet = data.get('subnet')
-    range_start = data.get('range_start')
-    range_end = data.get('range_end')
+    target = data.get('target')
     sudo_password = data.get('sudo_password')
     
-    if not all([subnet, range_start, range_end, sudo_password]):
+    if not all([target, sudo_password]):
         return jsonify({"error": "Missing parameters"}), 400
     
     os.makedirs("logs", exist_ok=True)
     
     try:
-        nmap_cmd = f"nmap -sn {subnet}.{range_start}-{range_end} -oX logs/hosts.xml"
+        nmap_cmd = f"nmap -sn {target} -oX logs/hosts.xml"
         
         return_code = run_nmap_with_password(nmap_cmd, sudo_password)
         
