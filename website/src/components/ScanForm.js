@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 const ScanForm = ({ onScanSubmit }) => {
-  const [subnet, setSubnet] = useState('192.168.1');
-  const [rangeStart, setRangeStart] = useState('1');
-  const [rangeEnd, setRangeEnd] = useState('254');
+  const [target, setTarget] = useState('192.168.1');
   const [sudoPassword, setSudoPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
@@ -12,9 +10,7 @@ const ScanForm = ({ onScanSubmit }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const scanInput = {
-      subnet,
-      range_start: rangeStart,
-      range_end: rangeEnd,
+      target,
       sudo_password: sudoPassword
     };
     onScanSubmit(scanInput);
@@ -26,51 +22,32 @@ const ScanForm = ({ onScanSubmit }) => {
       <h2>New Network Scan</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label>Subnet</label>
+          <label>Targets</label>
           <input 
             type="text" 
-            value={subnet} 
-            onChange={(e) => setSubnet(e.target.value)}
-            placeholder="e.g. 192.168.1"
+            value={target} 
+            onChange={(e) => setTarget(e.target.value)}
+            placeholder="e.g. 192.168.1.0"
           />
-        </div>
-        <div className="form-row">
-          <div className="form-group">
-            <label>Range Start</label>
-            <input 
-              type="text" 
-              value={rangeStart} 
-              onChange={(e) => setRangeStart(e.target.value)}
-              placeholder="e.g. 1"
-            />
-          </div>
-          <div className="form-group">
-            <label>Range End</label>
-            <input 
-              type="text" 
-              value={rangeEnd} 
-              onChange={(e) => setRangeEnd(e.target.value)}
-              placeholder="e.g. 254"
-            />
-          </div>
         </div>
         <div className="form-group">
           <label>Sudo Password (required for nmap)</label>
           <div className="password-input">
-            <input
-              type={showPassword ? "text" : "password"}
-              value={sudoPassword}
-              onChange={(e) => setSudoPassword(e.target.value)}
-              placeholder="Enter your sudo password"
-            />
-            <button 
-              type="button" 
-              className="toggle-password"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? "Hide" : "Show"}
-            </button>
-          </div>
+        <input
+          type={showPassword ? 'text' : 'password'}
+          value={sudoPassword}
+          onChange={(e) => setSudoPassword(e.target.value)}
+          placeholder="Enter your sudo password"
+        />
+        <button
+          type="button"
+          className="toggle-password"
+          onClick={() => setShowPassword(!showPassword)}
+          aria-label={showPassword ? 'Hide password' : 'Show password'}
+        >
+          {showPassword ? <FaEye /> : <FaEyeSlash /> }
+        </button>
+        </div>
           <small className="form-text">
             Your password is only used locally to execute scan commands and is never stored.
           </small>

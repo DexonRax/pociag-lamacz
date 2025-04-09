@@ -29,6 +29,7 @@ function App() {
   };
 
   const handleNewScan = async (scanInput) => {
+    toast.success("Scan executing...");
     setIsLoading(true);
     setError(null);
     try {
@@ -41,7 +42,6 @@ function App() {
         hosts: response.data.hosts || [],
       };
       setScanData([...scanData, newScan]);
-      toast.success("✅ Scan completed successfully!");
       setActiveScan(newScan.id);
       setActiveView('scanResults');
     } catch (err) {
