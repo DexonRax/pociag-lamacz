@@ -8,7 +8,7 @@ const Header = () => {
         <h1>vuln</h1>
       </div>
       <div className="header-controls">
-        <Link to="/scan-form">
+        <Link to="/scans">
           <button className="btn btn-primary">Nowy skan</button>
         </Link>
       </div>

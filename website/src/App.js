@@ -7,7 +7,10 @@ import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import ScanResults from './components/ScanResults';
 import Header from './components/Header';
-import ScanForm from './components/ScanForm';
+import Scans from './components/Scans';
+import BasicScan from './scans/BasicScan';
+import HostsScan from './scans/HostsScan';
+import ModbusScan from './scans/ModbusScan';
 import Help from './components/Help';
 import axios from 'axios';
 
@@ -79,8 +82,11 @@ function App() {
         <main className="content">
           <Routes>
             <Route path="/" element={renderMainView()} />
-            <Route path="/scan-form" element={<ScanForm onScanSubmit={handleNewScan} />} />
-            <Route path="/help" element={<Help />} /> {}
+            <Route path="/scans" element={<Scans onScanSubmit={handleNewScan} />} />
+            <Route path="/help" element={<Help />} />
+            <Route path="/scans/basic-scan" element={<BasicScan />} />
+            <Route path="/scans/hosts-scan" element={<HostsScan />} />
+            <Route path="/scans/modbus-scan" element={<ModbusScan />} />
           </Routes>
         </main>
       </div>

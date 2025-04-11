@@ -21,19 +21,39 @@ def run_nmap_with_password(cmd, password):
     
     return process.returncode
 
-def scan_modbus(subnet, range_start, range_end):
-    cmd = f"sudo nmap {nmap_flags} -p 22 {subnet}.{range_start}-{range_end} -oX logs/modbus.xml"
-    subprocess.run(cmd, shell=True, capture_output=False, text=True)
+@app.route('/scan-modbus-port', methods=['POST'])
+def scan_modbus():
+    data = request.get_json()
+    target = data.get('target')
+    flags = data.get('flags')
+    sudo_password = data.get('sudo_password')
 
-"""
-#def convert_xml_to_json(xml_filename, json_filename):
-    #if os.path.exists(f"logs/{xml_filename}.xml"):
-        #try:
-            #with open(xml_filename) as xml_file, open(json_filename, "w") as json_file:
-                #json.dump(xmltodict.parse(xml_file.read()), json_file, indent=4)
-        #except Exception as e:
-            #return
-"""
+    if not all([target, sudo_password]):
+        return jsonify({"Błąd": "Brakujące elementy"}), 400
+
+    try:
+        nmap_cmd = f"nmap {flags} -p 22 {target}" # tu naprawic zeby mudbus byl xddd
+        
+        return_code = run_nmap_with_password(nmap_cmd, sudo_password)
+        
+        if return_code != 0:
+            return jsonify({"błąd": f"Komenda nieukończona z błędem: {return_code}"}), 500
+        
+        hosts = []
+        
+        return jsonify({"hosts": hosts})
+    
+    except Exception as e:
+        return jsonify({"błąd": str(e)}), 500
+    
+@app.route('/export', methods=['POST'])
+def export():
+    if os.path.exists(f"logs/{xml_filename}.xml"):
+        try:
+            with open(xml_filename) as xml_file, open(json_filename, "w") as json_file:
+                json.dump(xmltodict.parse(xml_file.read()), json_file, indent=4)
+        except Exception as e: 
+            return jsonify({"błąd": str(e)}), 500
 
 @app.route('/scan-active-hosts', methods=['POST'])
 def scan_hosts():
