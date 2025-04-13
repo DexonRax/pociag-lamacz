@@ -1,0 +1,55 @@
+.scan-menu-container {
+    padding: 40px;
+    min-height: 100vh;
+    color: white;
+    font-family: sans-serif;
+  }
+  
+  .scan-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  
+  .scan-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    justify-items: center;
+  }
+  
+  .scan-box {
+    background-color: #1e1e1e;
+    border: 1px solid #1e1e1e;
+    border-radius: 16px;
+    padding: 24px;
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+  }
+  
+  .scan-box:hover {
+    background-color: #3a4555;
+    transform: translateY(-2px);
+  }
+  
+  .scan-icon {
+    margin-bottom: 16px;
+    color: #676969;
+  }
+  
+  .scan-heading {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  
+  .scan-description {
+    font-size: 14px;
+    color: #ccc;
+  }
+  

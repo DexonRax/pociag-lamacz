@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 const BasicScan = ({ onScanSubmit }) => {
   const [target, setTarget] = useState('192.168.1');
+  const [flags, setFlags] = useState('-T3 -sS');
+  const [ports, setPorts] = useState('22 80 502');
+  const [scripts, setScripts] = useState('default');
   const [sudoPassword, setSudoPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
@@ -11,6 +14,9 @@ const BasicScan = ({ onScanSubmit }) => {
     e.preventDefault();
     const scanInput = {
       target,
+      flags, 
+      ports, 
+      scripts,
       sudo_password: sudoPassword
     };
     onScanSubmit(scanInput);
@@ -30,6 +36,35 @@ const BasicScan = ({ onScanSubmit }) => {
             placeholder="e.g. 192.168.1.0"
           />
         </div>
+
+        <div className="form-group">
+          <label>Flags</label>
+          <input 
+            type="text" 
+            value={flags} 
+            onChange={(e) => setFlags(e.flags.value)}
+            placeholder="e.g. -T3"
+          />
+        </div>
+        <div className="form-group">
+          <label>Ports</label>
+          <input 
+            type="text" 
+            value={ports} 
+            onChange={(e) => setPorts(e.ports.value)}
+            placeholder="e.g. 22 80 502 520"
+          />
+        </div>
+        <div className="form-group">
+          <label>Scripts</label>
+          <input 
+            type="text" 
+            value={scripts} 
+            onChange={(e) => setScripts(e.scripts.value)}
+            placeholder="e.g. default"
+          />
+        </div>
+
         <div className="form-group">
           <label>Sudo Password (required for nmap)</label>
           <div className="password-input">

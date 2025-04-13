@@ -31,12 +31,24 @@ function App() {
     setActiveView('scanResults');
   };
 
-  const handleNewScan = async (scanInput) => {
+  const handleBasicScan = async (scanInput) => {
+    await handleNewScan('/scan-ports', scanInput);
+  };
+  
+  const handleHostsScan = async (scanInput) => {
+    await handleNewScan('/scan-active-hosts', scanInput);
+  };
+  
+  const handleModbusScan = async (scanInput) => {
+    await handleNewScan('/scan-modbus-port', scanInput);
+  };
+
+  const handleNewScan = async (url, scanInput) => {
     toast.success("Scan executing...");
     setIsLoading(true);
     setError(null);
     try {
-      const response = await axios.post('http://localhost:5000/scan-active-hosts', scanInput);
+      const response = await axios.post('http://localhost:5000${url}', scanInput);
       const newScan = {
         id: Date.now(),
         name: `Scan ${scanData.length + 1}`,
@@ -82,11 +94,11 @@ function App() {
         <main className="content">
           <Routes>
             <Route path="/" element={renderMainView()} />
-            <Route path="/scans" element={<Scans onScanSubmit={handleNewScan} />} />
+            <Route path="/scans" element={<Scans />} />
             <Route path="/help" element={<Help />} />
-            <Route path="/scans/basic-scan" element={<BasicScan />} />
-            <Route path="/scans/hosts-scan" element={<HostsScan />} />
-            <Route path="/scans/modbus-scan" element={<ModbusScan />} />
+            <Route path="/scans/basic-scan" element={<BasicScan onScanSubmit={handleBasicScan}/>} />
+            <Route path="/scans/hosts-scan" element={<HostsScan onScanSubmit={handleHostsScan}/>} />
+            <Route path="/scans/modbus-scan" element={<ModbusScan onScanSubmit={handleModbusScan}/>} />
           </Routes>
         </main>
       </div>
