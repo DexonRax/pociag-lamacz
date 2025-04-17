@@ -1,5 +1,4 @@
-"# pociag-lamacz" 
-Program z interfejsem graficznym dla przegladarek skanujacy aktywnych hostow ich porty i podatnosci w podanej podsieci uzywajac nmap
-Stworzone na praktykach 2025
-
-potrzebne package: subprocess, xmltodict, json, os
+#nuln 
+Program z interfejsem graficznym dla przegladarek skanujacy aktywnych hostow ich porty i podatnosci w podanej podsieci uzywajac nmap.
+<br/>Stworzone na praktykach 2025.
+<br/>wymagane package do obslugi programu znajdują się w requirements.txt
