@@ -7,19 +7,19 @@ CORS(app, resources={r"/*": {"origins": ["http://localhost:3000"]}})
 
 def run_nmap_with_password(cmd, password):
     process = subprocess.Popen(
-        ["sudo", "-S"] + cmd.split(), 
+        ["sudo", "-S"] + cmd.split(),
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True
     )
-    
-    stderr = process.communicate(input=f"{password}\n")
-    
+
+    stdout, stderr = process.communicate(input=f"{password}\n")
+
     if "Sorry, try again" in stderr:
         raise Exception("Uwierzytelnienie nieudane: złe hasło")
-    
-    return process.returncode
+
+    return process.returncode, stdout
 
 @app.route('/scan-modbus-port', methods=['POST'])
 def scan_modbus():
@@ -65,15 +65,35 @@ def scan_hosts():
         return jsonify({"Błąd": "Brakujące elementy"}), 400
     
     try:
-        nmap_cmd = f"nmap -sn {target}"
+        nmap_cmd = f"nmap -sn {target} -oX -"
         
-        return_code = run_nmap_with_password(nmap_cmd, sudo_password)
+        return_code, output = run_nmap_with_password(nmap_cmd, sudo_password)
         
         if return_code != 0:
             return jsonify({"błąd": f"Komenda nieukończona z błędem: {return_code}"}), 500
         
+        nmap_dict = xmltodict.parse(output)
+        raw_hosts = nmap_dict['nmaprun'].get('host', [])
         hosts = []
         
+        if isinstance(raw_hosts, dict):
+            raw_hosts = [raw_hosts]
+
+        for host in raw_hosts:
+            address = host.get('address')
+            status = host.get('status', {}).get('@state', 'unknown')
+
+            if isinstance(address, list):
+                ip = next((a['@addr'] for a in address if a['@addrtype'] == 'ipv4'), None)
+            elif isinstance(address, dict):
+                ip = address.get('@addr')
+            else:
+                ip = None
+
+            if ip:
+                hosts.append({"ip": ip, "status": status})
+        
+        print(hosts)
         return jsonify({"hosts": hosts})
     
     except Exception as e:

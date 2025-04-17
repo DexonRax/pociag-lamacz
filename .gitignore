@@ -2,3 +2,6 @@
 logs/
 *.xml
 *.json
+
+#ingoring web cache
+website/node_modules/

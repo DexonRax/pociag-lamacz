@@ -48,7 +48,8 @@ function App() {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await axios.post('http://localhost:5000${url}', scanInput);
+      const response = await axios.post(`http://localhost:5000${url}`, scanInput);
+
       const newScan = {
         id: Date.now(),
         name: `Scan ${scanData.length + 1}`,
@@ -56,6 +57,7 @@ function App() {
         date: new Date().toISOString().split('T')[0],
         hosts: response.data.hosts || [],
       };
+      console.log(response.data.hosts);
       setScanData([...scanData, newScan]);
       setActiveScan(newScan.id);
       setActiveView('scanResults');
