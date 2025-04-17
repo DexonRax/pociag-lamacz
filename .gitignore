@@ -5,3 +5,4 @@ logs/
 
 #ingoring web cache
 website/node_modules/
+node_modules/
