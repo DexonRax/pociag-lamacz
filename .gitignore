@@ -3,6 +3,9 @@ logs/
 *.xml
 *.json
 
+#ignoring logos
+logos/
+
 #ingoring web cache
 node_modules/
 

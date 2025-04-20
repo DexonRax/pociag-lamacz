@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { FaTrash } from "react-icons/fa";
+import { MdOutlineDashboard } from "react-icons/md";
+import { IoSettingsOutline, IoHelp  } from "react-icons/io5";
 const Sidebar = ({ activeView, onNavigate }) => {
   const navigate = useNavigate(); 
 
@@ -30,28 +32,28 @@ const Sidebar = ({ activeView, onNavigate }) => {
         <ul>
           <li className={activeView === 'dashboard' ? 'active' : ''}>
             <button onClick={handleDashboardClick}>
-              <span className="icon">📊</span>
-              <span>Dashboard</span>
+              <span className="icon"><MdOutlineDashboard /></span>
+              <span>Panel główny</span>
             </button>
           </li>
           <li className={activeView === 'trash' ? 'active' : ''}>
             <button onClick={handleTrashClick}>
-              <span className="icon">🗑️</span>
-              <span>Trash</span>
+              <span className="icon"><FaTrash /></span>
+              <span>Śmietnik</span>
             </button>
           </li>
           <li className={activeView === 'settings' ? 'active' : ''}>
             <button onClick={handleSettingsClick}>
-              <span className="icon">⚙️</span>
-              <span>Settings</span>
+              <span className="icon"><IoSettingsOutline /></span>
+              <span>Ustawienia</span>
             </button>
           </li>
         </ul>
       </nav>
       <div className="sidebar-footer">
         <button className={activeView === 'Help' ? 'btn btn-help active' : 'btn btn-help'} onClick={handleHelpClick}>
-          <span className="icon">❓</span>
-          <span>Help & Support</span>
+          <span className="icon"><IoHelp /></span>
+          <span>Pomoc</span>
         </button>
       </div>
     </aside>

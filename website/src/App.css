@@ -180,9 +180,11 @@ ul {
   background-color: var(--accent-primary);
 }
 
-.sidebar-nav .icon {
+.sidebar-nav .icon, .sidebar-footer .icon {
+  position: relative;
   margin-right: 1rem;
   font-size: 1.25rem;
+  top: 3px;
   width: 1.5rem;
   text-align: center;
 }

@@ -68,11 +68,24 @@ const ScanResults = ({ scanData, vulnerabilities, onVulnerabilitySelect }) => {
       <div className="section">
         <h3>Active Hosts</h3>
         {scanData.hosts && scanData.hosts.length > 0 ? (
-          <ul className="host-list">
-            {scanData.hosts.map((host, index) => (
-              <li key={index}>{host}</li>
-            ))}
-          </ul>
+          <div className="table-container">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>IP Address</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {scanData.hosts.map((host, index) => (
+                  <tr key={index}>
+                    <td>{host.ip}</td>
+                    <td>{host.status}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <div className="empty-state">
             <p>No active hosts found in this scan.</p>
