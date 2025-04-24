@@ -55,9 +55,9 @@ function App() {
         name: `Scan ${scanData.length + 1}`,
         status: 'Complete',
         date: new Date().toISOString().split('T')[0],
-        hosts: response.data.hosts || [],
+        data: response.data.data || [],
       };
-      console.log(response.data.hosts);
+      console.log(response.data);
       setScanData([...scanData, newScan]);
       setActiveScan(newScan.id);
       setActiveView('scanResults');

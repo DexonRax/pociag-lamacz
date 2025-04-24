@@ -26,7 +26,7 @@ const ScanResults = ({ scanData, vulnerabilities, onVulnerabilitySelect }) => {
           <span className="scan-date">{scanData.date}</span>
         </div>
       </div>
-
+      <span className="scan-date"><b>Komenda: </b>{scanData.data?.find(x => x.cmd)?.cmd}</span>
       <div className="section">
         <h3>Vulnerabilities</h3>
         {vulnerabilities.length === 0 ? (
@@ -67,20 +67,24 @@ const ScanResults = ({ scanData, vulnerabilities, onVulnerabilitySelect }) => {
 
       <div className="section">
         <h3>Active Hosts</h3>
-        {scanData.hosts && scanData.hosts.length > 0 ? (
+        {scanData.data && scanData.data.length > 0 ? (
           <div className="table-container">
             <table className="data-table">
               <thead>
                 <tr>
                   <th>IP Address</th>
-                  <th>Status</th>
+                  <th>MAC Address</th>
+                  <th>Host Name</th>
                 </tr>
               </thead>
               <tbody>
-                {scanData.hosts.map((host, index) => (
+                {scanData.data
+                .filter(x => x.ip)
+                .map((data, index) => (
                   <tr key={index}>
-                    <td>{host.ip}</td>
-                    <td>{host.status}</td>
+                    <td>{data.ip}</td>
+                    <td>{data.mac}</td>
+                    <td>{data.name}</td>
                   </tr>
                 ))}
               </tbody>

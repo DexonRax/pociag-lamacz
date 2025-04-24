@@ -39,6 +39,12 @@ def use_cmd(data, cmd):
             
     return xmltodict.parse(output)
 
+def get_info(nmap_dict):
+    raw_cmd = nmap_dict['nmaprun'].get('@args')
+    info = []
+    info.append({"cmd": raw_cmd})
+    return info
+
 def get_hosts(nmap_dict):
     raw_hosts = nmap_dict['nmaprun'].get('host', [])
     hosts = []
@@ -48,18 +54,37 @@ def get_hosts(nmap_dict):
 
     for host in raw_hosts:
         if isinstance(host, dict):
-            address = host.get('address')
-            status = host.get('status', {}).get('@state', 'unknown')
+            addresses = host.get('address', [])
+            hostnames = host.get('hostnames', {}).get('hostname', {})
 
-            if isinstance(address, list):
-                ip = next((a['@addr'] for a in address if a['@addrtype'] == 'ipv4'), None)
-            elif isinstance(address, dict):
-                ip = address.get('@addr')
+            ip = None
+            mac = None
+
+            if isinstance(addresses, list):
+                for addr in addresses:
+                    if addr.get('@addrtype') == 'ipv4':
+                        ip = addr.get('@addr')
+                    elif addr.get('@addrtype') == 'mac':
+                        mac = addr.get('@addr')
+            elif isinstance(addresses, dict):
+                if addresses.get('@addrtype') == 'ipv4':
+                    ip = addresses.get('@addr')
+                elif addresses.get('@addrtype') == 'mac':
+                    mac = addresses.get('@addr')
+
+            if isinstance(hostnames, list):
+                hostname = hostnames[0].get('@name')
+            elif isinstance(hostnames, dict):
+                hostname = hostnames.get('@name')
             else:
-                ip = None
+                hostname = None
 
             if ip:
-                hosts.append({"ip": ip, "status": status})
+                hosts.append({
+                    "ip": ip,
+                    "mac": mac,
+                    "name": hostname
+                })
 
     return hosts
 
@@ -88,8 +113,8 @@ def scan_modbus():
         nmap_cmd = f"nmap {flags} -p 22 {target}" # tu naprawic zeby mudbus byl xddd
         nmap_dict = use_cmd(data, nmap_cmd)
 
-        hosts = get_hosts(nmap_dict)
-        return jsonify({"hosts": hosts})
+        data = get_hosts(nmap_dict) + get_info(nmap_dict)
+        return jsonify({"data": data})
     
     except Exception as e:
         return jsonify({"błąd": str(e)}), 500
@@ -106,8 +131,8 @@ def scan_hosts():
         nmap_cmd = f"nmap -sn {target} -oX -"
         nmap_dict = use_cmd(data, nmap_cmd)
 
-        hosts = get_hosts(nmap_dict)
-        return jsonify({"hosts": hosts})
+        data = get_hosts(nmap_dict) + get_info(nmap_dict)
+        return jsonify({"data": data})
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -127,9 +152,8 @@ def scan_ports():
         nmap_cmd = f"sudo nmap {flags} -p {ports} --script {script} {target}"
         nmap_dict = use_cmd(data, nmap_cmd)
 
-        hosts = get_hosts(nmap_dict)
-        print(hosts)
-        return jsonify({"hosts": hosts})
+        data = get_hosts(nmap_dict) + get_info(nmap_dict)
+        return jsonify({"data": data})
     
     except Exception as e:
         return jsonify({"błąd": str(e)}), 500

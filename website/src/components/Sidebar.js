@@ -50,6 +50,7 @@ const Sidebar = ({ activeView, onNavigate }) => {
           </li>
         </ul>
       </nav>
+      dodac wiecej info do skan wynikow
       <div className="sidebar-footer">
         <button className={activeView === 'Help' ? 'btn btn-help active' : 'btn btn-help'} onClick={handleHelpClick}>
           <span className="icon"><IoHelp /></span>
